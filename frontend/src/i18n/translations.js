@@ -35,7 +35,7 @@ export const translations = {
 
         // Change Types
         cancellation: 'ביטול שיעור',
-        roomChange: 'החלפת חדר',
+        room_change: 'החלפת חדר',
         lesson: 'שיעור',
         room: 'חדר',
 
@@ -97,7 +97,7 @@ export const translations = {
 
         // Change Types
         cancellation: 'Class Cancelled',
-        roomChange: 'Room Change',
+        room_change: 'Room Change',
         lesson: 'Lesson',
         room: 'Room',
 
