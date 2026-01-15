@@ -6,7 +6,7 @@
     --primary-light: #818CF8;
     --secondary: #06B6D4;
     --success: #10B981;
-    --warning: #F59E0B;
+    --warning: #FFC107;
     --danger: #EF4444;
     --bg: #F9FAFB;
     --surface: #FFFFFF;
@@ -61,7 +61,9 @@ body[dir="ltr"] {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Container */
@@ -409,6 +411,7 @@ body[dir="ltr"] {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -424,15 +427,15 @@ body[dir="ltr"] {
     .container {
         padding: 12px;
     }
-    
+
     .card {
         padding: 16px;
     }
-    
+
     .progress-steps {
         padding: 0;
     }
-    
+
     .progress-step-label {
         font-size: 10px;
     }
@@ -465,6 +468,7 @@ body[dir="ltr"] {
     cursor: pointer;
     white-space: nowrap;
 }
+
 /* Responsive Design */
 @media (max-width: 600px) {
     .container {
