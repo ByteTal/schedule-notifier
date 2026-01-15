@@ -299,4 +299,9 @@ def start_server(host='0.0.0.0', port=5000, debug=False):
 
 
 if __name__ == '__main__':
-    start_server(debug=True)
+    # Get configuration from environment variables
+    host = os.getenv('HOST', '0.0.0.0')
+    port = int(os.getenv('PORT', '5000'))
+    debug = os.getenv('DEBUG', 'False').lower() == 'true'
+    
+    start_server(host=host, port=port, debug=debug)
