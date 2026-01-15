@@ -26,6 +26,12 @@ notifier = NotificationService(os.getenv('FIREBASE_CREDENTIALS_PATH'))
 scraper = BeginHSScraper()
 monitor = ScheduleMonitor(db, notifier)
 
+# Start scheduler immediately (gunicorn will load this once per worker)
+# We use 1 worker in production, so this is safe
+interval_minutes = int(os.getenv('CHECK_INTERVAL_MINUTES', '20'))
+monitor.start(interval_minutes=interval_minutes)
+print(f"Scheduler started (interval: {interval_minutes}m)")
+
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
@@ -283,19 +289,10 @@ def test_notification():
 
 
 def start_server(host='0.0.0.0', port=5000, debug=False):
-    """Start the Flask server and background scheduler."""
-    # Start the background scheduler
-    interval_minutes = int(os.getenv('CHECK_INTERVAL_MINUTES', '20'))
-    monitor.start(interval_minutes=interval_minutes)
-    
+    """Start the Flask server."""
     print(f"Starting Schedule Notifier API on {host}:{port}")
-    print(f"Background checks running every {interval_minutes} minutes")
     
-    try:
-        app.run(host=host, port=port, debug=debug)
-    finally:
-        # Stop scheduler on shutdown
-        monitor.stop()
+    app.run(host=host, port=port, debug=debug)
 
 
 if __name__ == '__main__':
