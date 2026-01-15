@@ -61,8 +61,12 @@ class NotificationService {
                 return this.deviceToken;
             }
 
+            // Get existing service worker registration
+            const registration = await navigator.serviceWorker.ready;
+
             const token = await getToken(this.messaging, {
-                vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
+                vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
+                serviceWorkerRegistration: registration
             });
 
             if (token) {
