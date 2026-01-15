@@ -6,7 +6,12 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 class ApiClient {
     async get(endpoint) {
-        const response = await fetch(`${API_URL}${endpoint}`);
+        const response = await fetch(`${API_URL}${endpoint}`, {
+            headers: {
+                'ngrok-skip-browser-warning': 'true',
+                'Content-Type': 'application/json',
+            }
+        });
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -17,6 +22,7 @@ class ApiClient {
         const response = await fetch(`${API_URL}${endpoint}`, {
             method: 'POST',
             headers: {
+                'ngrok-skip-browser-warning': 'true',
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(data),
@@ -31,6 +37,7 @@ class ApiClient {
         const response = await fetch(`${API_URL}${endpoint}`, {
             method: 'PUT',
             headers: {
+                'ngrok-skip-browser-warning': 'true',
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(data),
