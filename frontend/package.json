@@ -1,0 +1,17 @@
+{
+  "name": "schedule-notifier",
+  "version": "1.0.0",
+  "description": "Schedule change notification app for Begin High School",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "firebase": "^10.7.1",
+    "i18next": "^23.7.6"
+  },
+  "devDependencies": {
+    "vite": "^5.0.8"
+  }
+}
