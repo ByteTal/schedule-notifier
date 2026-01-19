@@ -319,11 +319,15 @@ export class HomeComponent {
                     this.renderChanges(document.querySelector('.container')); // Assuming container is available or we re-render
 
                     // Force full re-render to update any other state
+                    // Force full re-render to update any other state
                     this.render().then(newElement => {
                         const content = document.getElementById('content');
-                        content.innerHTML = '';
-                        content.appendChild(this.createHeader());
-                        content.appendChild(newElement);
+                        const oldContainer = content.querySelector('.container');
+                        if (oldContainer) {
+                            oldContainer.replaceWith(newElement);
+                        } else {
+                            content.appendChild(newElement);
+                        }
                     });
 
                     modal.remove();
