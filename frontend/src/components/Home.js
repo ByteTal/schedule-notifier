@@ -34,7 +34,7 @@ export class HomeComponent {
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                     <h2 class="card-title" style="margin: 0;">${this.className}</h2>
                     <button id="settings-btn" class="btn btn-secondary" style="padding: 8px 16px;">
-                        ⚙️ ${i18n.t('settings')}
+                        ${i18n.t('settings')}
                     </button>
                 </div>
             </div>
@@ -43,7 +43,7 @@ export class HomeComponent {
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                     <h3 class="card-title" style="margin: 0;">${i18n.t('recentChanges')}</h3>
                     <button id="toggle-all-btn" class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px;">
-                        👁️ ${i18n.t('viewAllChanges') || 'View All'}
+                        ${i18n.t('viewAllChanges') || 'View All'}
                     </button>
                 </div>
                 <div id="changes-list">
@@ -69,8 +69,8 @@ export class HomeComponent {
             this.showingAllChanges = !this.showingAllChanges;
             const btn = container.querySelector('#toggle-all-btn');
             btn.textContent = this.showingAllChanges ?
-                `👁️ ${i18n.t('viewMyChanges') || 'My Changes'}` :
-                `👁️ ${i18n.t('viewAllChanges') || 'View All'}`;
+                `${i18n.t('viewMyChanges') || 'My Changes'}` :
+                `${i18n.t('viewAllChanges') || 'View All'}`;
             this.renderChanges(container);
         });
 
@@ -119,7 +119,6 @@ export class HomeComponent {
 
             changesList.innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-state-icon">📅</div>
                     <h3>${i18n.t('noChanges')}</h3>
                     <p>${message}</p>
                 </div>

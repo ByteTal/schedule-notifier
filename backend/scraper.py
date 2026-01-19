@@ -285,14 +285,28 @@ class BeginHSScraper:
         change_type = 'cancellation'
         new_room = None
         
-        if 'ביטול' in description:
-            change_type = 'cancellation'
-        elif 'החלפת חדר' in description:
+        if 'החלפת חדר' in text:
             change_type = 'room_change'
-            # Extract new room number
-            room_match = re.search(r'לחדר\s+(\S+)', description)
+            
+            # If "החלפת חדר" is in the teacher part, clean it
+            if 'החלפת חדר' in teacher:
+                teacher = teacher.replace('החלפת חדר לקבוצה', '').strip()
+                # Also remove leading " - " if present
+                if teacher.startswith('-'):
+                    teacher = teacher[1:].strip()
+
+            # Extract new room number from description or full text
+            room_match = re.search(r'לחדר\s+(\S+)', text)
             if room_match:
                 new_room = room_match.group(1)
+            
+            # Clean description
+            description = description.replace('החלפת חדר', '').replace('לקבוצה', '').strip()
+            if description.startswith(teacher):
+                 description = description[len(teacher):].strip()
+            
+        elif 'ביטול' in description or 'ביטול' in text:
+            change_type = 'cancellation'
         
         return ScheduleChange(
             date=date,

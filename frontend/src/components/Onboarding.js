@@ -197,7 +197,6 @@ export class OnboardingComponent {
     async renderCompletion(container) {
         container.innerHTML = `
             <div class="card" style="text-align: center;">
-                <div style="font-size: 64px; margin-bottom: 16px;">✅</div>
                 <h2 class="card-title">${i18n.t('welcome')}</h2>
                 <p style="color: var(--text-secondary);">
                     ${i18n.t('welcomeMessage')}
