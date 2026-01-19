@@ -28,6 +28,7 @@ class ScheduleChange:
     date: str
     lesson_number: int
     teacher: str
+    subject: str
     change_type: str  # 'cancellation' or 'room_change'
     description: str
     new_room: Optional[str] = None
@@ -234,6 +235,15 @@ class BeginHSScraper:
         Get current schedule changes for a specific class.
         Returns: List of ScheduleChange objects.
         """
+        # First get the schedule to map lesson numbers to subjects
+        schedule = self.get_schedule(class_id)
+        
+        # Create a mapping of (day, lesson_number, teacher) -> subject
+        lesson_map = {}
+        for lesson in schedule:
+            key = (lesson.lesson_number, lesson.teacher)
+            lesson_map[key] = lesson.subject
+        
         # Select the class
         self._select_class(class_id)
         
@@ -253,13 +263,13 @@ class BeginHSScraper:
             
             # Parse the change text
             # Format: "DD.MM.YYYY, שיעור N, Teacher Name, Description"
-            change = self._parse_change_text(text)
+            change = self._parse_change_text(text, lesson_map)
             if change:
                 changes.append(change)
         
         return changes
     
-    def _parse_change_text(self, text: str) -> Optional[ScheduleChange]:
+    def _parse_change_text(self, text: str, lesson_map: Dict) -> Optional[ScheduleChange]:
         """Parse a change text string into a ScheduleChange object."""
         # Split by comma
         parts = [p.strip() for p in text.split(',')]
@@ -308,10 +318,14 @@ class BeginHSScraper:
         elif 'ביטול' in description or 'ביטול' in text:
             change_type = 'cancellation'
         
+        # Lookup subject from lesson map
+        subject = lesson_map.get((lesson_number, teacher), 'Unknown')
+        
         return ScheduleChange(
             date=date,
             lesson_number=lesson_number,
             teacher=teacher,
+            subject=subject,
             change_type=change_type,
             description=description,
             new_room=new_room
