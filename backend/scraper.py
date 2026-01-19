@@ -328,8 +328,14 @@ class BeginHSScraper:
         # First, collect all subject-teacher pairs
         subject_teacher_pairs = {}
         for lesson in lessons:
-            # Remove numbers and extra spaces from subject name
-            base_subject = re.sub(r'\s*\d+\s*$', '', lesson.subject).strip()
+            # Normalize subject name for grouping
+            # 1. Match "Subject X Units" pattern (e.g., "English 5 units COBE" -> "English 5 units")
+            match = re.search(r'^(.+?)\s+(\d+)\s*(?:יח[:\-\'"”]?ל?|יחידות).*$', lesson.subject)
+            if match:
+                base_subject = f"{match.group(1).strip()} {match.group(2)} יח'"
+            else:
+                # 2. Fallback: Remove trailing numbers (e.g., "Sifrut 30" -> "Sifrut")
+                base_subject = re.sub(r'\s*\d+\s*$', '', lesson.subject).strip()
             
             if base_subject not in subject_teacher_pairs:
                 subject_teacher_pairs[base_subject] = set()
