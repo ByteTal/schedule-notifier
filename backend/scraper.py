@@ -321,21 +321,31 @@ class BeginHSScraper:
         # Lookup subject from lesson map - try exact match first
         subject = lesson_map.get((lesson_number, teacher))
         
-        # If no exact match, try fuzzy matching on teacher name
+        # If no exact match, try fuzzy matching on teacher name for same lesson number
         if not subject:
-            # Try to find a teacher with similar name for this lesson number
             for (l_num, l_teacher), l_subject in lesson_map.items():
                 if l_num == lesson_number:
-                    # Check if teacher names are similar (contain each other or share significant overlap)
                     teacher_lower = teacher.lower().strip()
                     l_teacher_lower = l_teacher.lower().strip()
                     
-                    # Try various matching strategies
                     if (teacher_lower in l_teacher_lower or 
                         l_teacher_lower in teacher_lower or
                         teacher_lower.replace(' ', '') == l_teacher_lower.replace(' ', '')):
                         subject = l_subject
                         break
+        
+        # If still no match, try to find ANY lesson taught by this teacher
+        # (useful for substitute lessons or changes to lessons not in regular schedule)
+        if not subject:
+            for (l_num, l_teacher), l_subject in lesson_map.items():
+                teacher_lower = teacher.lower().strip()
+                l_teacher_lower = l_teacher.lower().strip()
+                
+                if (teacher_lower in l_teacher_lower or 
+                    l_teacher_lower in teacher_lower or
+                    teacher_lower.replace(' ', '') == l_teacher_lower.replace(' ', '')):
+                    subject = l_subject
+                    break
         
         # Default to 'Unknown' if still not found
         if not subject:
