@@ -133,7 +133,7 @@ export class HomeComponent {
                         <span class="change-date">${change.date}</span>
                     </div>
                     <div class="change-details">
-                        <span class="change-teacher">${change.teacher}</span> - 
+                        <span class="change-teacher">${change.teacher}</span> (${change.subject}) - 
                         ${i18n.t('lesson')} ${change.lesson_number}
                         ${change.new_room ? `<br>${i18n.t('room')}: ${change.new_room}` : ''}
                     </div>
@@ -218,7 +218,7 @@ export class HomeComponent {
                 </div>
                 <div style="margin-top: 16px; display: flex; gap: 12px;">
                     <button class="btn btn-secondary" id="cancel-edit-btn" style="flex: 1;">
-                        ${i18n.t('cancel') || 'Cancel'}
+                        ${i18n.t('back')}
                     </button>
                     <button class="btn btn-primary" id="save-teachers-btn" style="flex: 2;">
                         ${i18n.t('save') || 'Save'}
@@ -243,7 +243,7 @@ export class HomeComponent {
         // Load schedule and teachers
         try {
             const response = await api.getSchedule(this.classId);
-            const subjects = response.subjects;
+            const subjects = response.subjects.sort((a, b) => a.subject.localeCompare(b.subject));
 
             // Clone detailed preferences for editing
             const currentPreferences = { ...this.teacherPreferences };

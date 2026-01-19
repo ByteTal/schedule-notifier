@@ -59,6 +59,9 @@ export const translations = {
         errorLoadingSchedule: 'שגיאה בטעינת המערכת',
         errorRegistering: 'שגיאה ברישום',
         tryAgain: 'נסה שוב',
+        save: 'שמור',
+        cancel: 'ביטול',
+        saving: 'שומר...',
 
         // Progress Steps
         step1: 'כיתה',
@@ -122,6 +125,9 @@ export const translations = {
         errorLoadingSchedule: 'Error loading schedule',
         errorRegistering: 'Error registering',
         tryAgain: 'Try Again',
+        save: 'Save',
+        cancel: 'Cancel',
+        saving: 'Saving...',
 
         // Progress Steps
         step1: 'Class',

@@ -140,7 +140,7 @@ export class OnboardingComponent {
         // Load schedule
         try {
             const response = await api.getSchedule(this.selectedClass);
-            this.subjects = response.subjects;
+            this.subjects = response.subjects.sort((a, b) => a.subject.localeCompare(b.subject));
 
             const teacherList = container.querySelector('#teacher-list');
             teacherList.innerHTML = '';
