@@ -41,6 +41,7 @@ export const translations = {
 
         // Settings
         changeClass: 'שנה כיתה',
+        editTeachers: 'עריכת מורים',
         updateTeachers: 'עדכן מורים',
         language: 'שפה',
         notifications: 'התראות',
@@ -103,6 +104,7 @@ export const translations = {
 
         // Settings
         changeClass: 'Change Class',
+        editTeachers: 'Edit Teachers',
         updateTeachers: 'Update Teachers',
         language: 'Language',
         notifications: 'Notifications',
