@@ -163,7 +163,7 @@ export class HomeComponent {
                 <h3 class="card-title">${i18n.t('settings')}</h3>
                 <div style="margin-bottom: 16px;">
                     <button class="btn btn-secondary btn-full" id="edit-teachers-btn">
-                         ✏️ ${i18n.t('editTeachers') || 'Edit Teachers'}
+                         ${i18n.t('editTeachers') || 'Edit Teachers'}
                     </button>
                 </div>
                 <div style="margin-bottom: 16px;">
