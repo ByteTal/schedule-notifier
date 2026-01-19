@@ -13,6 +13,7 @@ export class HomeComponent {
         this.allChanges = [];
         this.showingAllChanges = false;
         this.selectedTeachers = this.getSelectedTeachers();
+        this.teacherPreferences = {};
     }
 
     getSelectedTeachers() {
@@ -83,7 +84,8 @@ export class HomeComponent {
             if (deviceToken) {
                 try {
                     const userResponse = await api.getUser(deviceToken);
-                    this.selectedTeachers = Object.values(userResponse.user.preferences || {});
+                    this.teacherPreferences = userResponse.user.preferences || {};
+                    this.selectedTeachers = Object.values(this.teacherPreferences);
                 } catch (e) {
                     console.log('Could not load user preferences:', e);
                 }
@@ -160,6 +162,11 @@ export class HomeComponent {
             <div class="card" style="max-width: 400px; width: 90%; margin: 20px;">
                 <h3 class="card-title">${i18n.t('settings')}</h3>
                 <div style="margin-bottom: 16px;">
+                    <button class="btn btn-secondary btn-full" id="edit-teachers-btn">
+                         ✏️ ${i18n.t('editTeachers') || 'Edit Teachers'}
+                    </button>
+                </div>
+                <div style="margin-bottom: 16px;">
                     <button class="btn btn-secondary btn-full" onclick="localStorage.clear(); location.reload();">
                         ${i18n.t('changeClass')}
                     </button>
@@ -179,5 +186,161 @@ export class HomeComponent {
                 modal.remove();
             }
         });
+
+        modal.querySelector('#edit-teachers-btn').addEventListener('click', () => {
+            modal.remove();
+            this.showTeacherSelection();
+        });
+    }
+
+    async showTeacherSelection() {
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        `;
+
+        modal.innerHTML = `
+            <div class="card" style="max-width: 500px; width: 90%; margin: 20px; max-height: 90vh; overflow-y: auto;">
+                <h3 class="card-title">${i18n.t('editTeachers') || 'Edit Teachers'}</h3>
+                <div id="teacher-list-modal" style="min-height: 200px;">
+                    <div style="text-align: center; padding: 40px;">
+                        <div class="spinner" style="margin: 0 auto 16px;"></div>
+                        ${i18n.t('loading')}
+                    </div>
+                </div>
+                <div style="margin-top: 16px; display: flex; gap: 12px;">
+                    <button class="btn btn-secondary" id="cancel-edit-btn" style="flex: 1;">
+                        ${i18n.t('cancel') || 'Cancel'}
+                    </button>
+                    <button class="btn btn-primary" id="save-teachers-btn" style="flex: 2;">
+                        ${i18n.t('save') || 'Save'}
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Close on background click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+
+        modal.querySelector('#cancel-edit-btn').addEventListener('click', () => {
+            modal.remove();
+        });
+
+        // Load schedule and teachers
+        try {
+            const response = await api.getSchedule(this.classId);
+            const subjects = response.subjects;
+
+            // Clone detailed preferences for editing
+            const currentPreferences = { ...this.teacherPreferences };
+
+            const teacherList = modal.querySelector('#teacher-list-modal');
+            teacherList.innerHTML = '';
+
+            subjects.forEach(subject => {
+                const item = document.createElement('div');
+                item.className = 'teacher-item';
+
+                const selectedTeacher = currentPreferences[subject.subject];
+
+                item.innerHTML = `
+                    <div class="teacher-subject">${subject.subject}</div>
+                    <div class="teacher-options" data-subject="${subject.subject}">
+                        ${subject.teachers.map(teacher => `
+                            <div class="teacher-option ${teacher === selectedTeacher ? 'selected' : ''}" data-teacher="${teacher}">
+                                ${teacher}
+                            </div>
+                        `).join('')}
+                        <div class="teacher-option none ${!selectedTeacher ? 'selected' : ''}" data-teacher="">
+                            ${i18n.t('noTeacher')}
+                        </div>
+                    </div>
+                `;
+                teacherList.appendChild(item);
+            });
+
+            // Event listeners for teacher selection
+            teacherList.querySelectorAll('.teacher-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    const subject = e.target.closest('.teacher-options').dataset.subject;
+                    const teacher = e.target.dataset.teacher;
+
+                    // Deselect others in same subject
+                    e.target.closest('.teacher-options').querySelectorAll('.teacher-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+
+                    // Select this one
+                    e.target.classList.add('selected');
+
+                    // Store selection
+                    if (teacher) {
+                        currentPreferences[subject] = teacher;
+                    } else {
+                        delete currentPreferences[subject];
+                    }
+                });
+            });
+
+            // Save button
+            modal.querySelector('#save-teachers-btn').addEventListener('click', async () => {
+                const btn = modal.querySelector('#save-teachers-btn');
+                const originalText = btn.textContent;
+                btn.disabled = true;
+                btn.textContent = i18n.t('saving') || 'Saving...';
+
+                try {
+                    const deviceToken = localStorage.getItem('fcm_token');
+                    await api.updatePreferences(
+                        deviceToken,
+                        currentPreferences,
+                        i18n.getLanguage()
+                    );
+
+                    // Update local state
+                    this.teacherPreferences = currentPreferences;
+                    this.selectedTeachers = Object.values(currentPreferences);
+
+                    // Refresh view
+                    this.renderChanges(document.querySelector('.container')); // Assuming container is available or we re-render
+
+                    // Force full re-render to update any other state
+                    this.render().then(newElement => {
+                        const content = document.getElementById('content');
+                        content.innerHTML = '';
+                        content.appendChild(this.createHeader());
+                        content.appendChild(newElement);
+                    });
+
+                    modal.remove();
+
+                } catch (error) {
+                    alert(`${i18n.t('error')}: ${error.message}`);
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            });
+
+        } catch (error) {
+            modal.querySelector('#teacher-list-modal').innerHTML = `
+                <p style="color: var(--danger);">${i18n.t('errorLoadingSchedule')}: ${error.message}</p>
+            `;
+        }
     }
 }
+
