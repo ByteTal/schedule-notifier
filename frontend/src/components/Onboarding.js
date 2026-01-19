@@ -90,9 +90,20 @@ export class OnboardingComponent {
                 container.querySelector('#next-btn').disabled = !this.selectedClass;
             });
 
-            container.querySelector('#next-btn').addEventListener('click', () => {
+            container.querySelector('#next-btn').addEventListener('click', async () => {
                 this.currentStep = 2;
-                this.renderStep(container.parentElement.querySelector('#step-content'));
+                // Re-render the whole component to update progress bar
+                const newContent = await this.render();
+                const mainContainer = container.closest('.container');
+                if (mainContainer) {
+                    mainContainer.id = 'temp-id'; // unique id to find it
+                    mainContainer.replaceWith(newContent);
+                } else if (container.parentElement && container.parentElement.className.includes('container')) {
+                    container.parentElement.replaceWith(newContent);
+                } else {
+                    // Fallback if structure is different
+                    this.renderStep(container.parentElement.querySelector('#step-content'));
+                }
             });
 
         } catch (error) {
@@ -177,9 +188,14 @@ export class OnboardingComponent {
             });
 
             // Back button
-            container.querySelector('#back-btn').addEventListener('click', () => {
+            container.querySelector('#back-btn').addEventListener('click', async () => {
                 this.currentStep = 1;
-                this.renderStep(container.parentElement.querySelector('#step-content'));
+                const newContent = await this.render();
+                // Find the top-level container to replace
+                const stepContent = container.parentElement;
+                if (stepContent && stepContent.parentElement) {
+                    stepContent.parentElement.replaceWith(newContent);
+                }
             });
 
             // Finish button

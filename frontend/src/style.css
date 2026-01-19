@@ -364,11 +364,18 @@ body[dir="ltr"] {
     content: '';
     position: absolute;
     top: 15px;
-    right: 50%;
+    top: 15px;
+    right: auto;
+    left: 50%;
     width: 100%;
     height: 2px;
     background: var(--border);
     z-index: -1;
+}
+
+body[dir="ltr"] .progress-step::before {
+    left: auto;
+    right: 50%;
 }
 
 .progress-step:first-child::before {
