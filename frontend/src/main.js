@@ -22,6 +22,10 @@ class App {
         // Set up notification listener
         notificationService.onMessageReceived((payload) => {
             console.log('Notification received:', payload);
+
+            // Show in-app notification banner
+            this.showNotificationBanner(payload);
+
             // Refresh changes if on home screen
             if (this.currentComponent instanceof HomeComponent) {
                 this.render();
@@ -83,6 +87,51 @@ class App {
                 this.render();
             }
         });
+    }
+
+    showNotificationBanner(payload) {
+        // Create notification banner
+        const banner = document.createElement('div');
+        banner.style.cssText = `
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            z-index: 10000;
+            max-width: 90%;
+            animation: slideDown 0.3s ease;
+            cursor: pointer;
+        `;
+
+        const title = payload.notification?.title || 'Notification';
+        const body = payload.notification?.body || '';
+
+        banner.innerHTML = `
+            <div style="font-weight: 700; margin-bottom: 4px;">${title}</div>
+            <div style="font-size: 14px; opacity: 0.9;">${body}</div>
+        `;
+
+        // Add click handler to close
+        banner.addEventListener('click', () => {
+            banner.style.animation = 'slideUp 0.3s ease';
+            setTimeout(() => banner.remove(), 300);
+        });
+
+        // Add to document
+        document.body.appendChild(banner);
+
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (banner.parentElement) {
+                banner.style.animation = 'slideUp 0.3s ease';
+                setTimeout(() => banner.remove(), 300);
+            }
+        }, 5000);
     }
 }
 
