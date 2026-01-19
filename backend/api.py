@@ -16,18 +16,25 @@ from scheduler import ScheduleMonitor
 # Load environment variables
 load_dotenv()
 
-# Delete database on startup to clear invalid tokens
+# Initialize database first
 DB_PATH = os.getenv('DATABASE_PATH', 'schedule_notifier.db')
-if os.path.exists(DB_PATH):
-    os.remove(DB_PATH)
-    print(f"🗑️  Deleted existing database: {DB_PATH}")
+db = Database(DB_PATH)
+
+# Clear schedule-related tables on startup (keep user tokens)
+try:
+    with db.get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM changes_history')
+        cursor.execute('DELETE FROM schedule_cache')
+        print(f"🗑️  Cleared schedule data from database (kept user tokens)")
+except Exception as e:
+    print(f"Note: Could not clear schedule tables: {e}")
 
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app)  # Enable CORS for web app
 
-# Initialize services
-db = Database(DB_PATH)
+# Initialize services (db already created above)
 notifier = NotificationService(os.getenv('FIREBASE_CREDENTIALS_PATH'))
 scraper = BeginHSScraper()
 monitor = ScheduleMonitor(db, notifier)
