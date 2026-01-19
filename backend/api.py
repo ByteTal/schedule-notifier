@@ -238,6 +238,7 @@ def get_live_changes(class_id):
                 'date': change.date,
                 'lesson_number': change.lesson_number,
                 'teacher': change.teacher,
+                'subject': change.subject,
                 'change_type': change.change_type,
                 'description': change.description,
                 'new_room': change.new_room
