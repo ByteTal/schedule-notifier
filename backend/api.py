@@ -16,12 +16,18 @@ from scheduler import ScheduleMonitor
 # Load environment variables
 load_dotenv()
 
+# Delete database on startup to clear invalid tokens
+DB_PATH = os.getenv('DATABASE_PATH', 'schedule_notifier.db')
+if os.path.exists(DB_PATH):
+    os.remove(DB_PATH)
+    print(f"🗑️  Deleted existing database: {DB_PATH}")
+
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app)  # Enable CORS for web app
 
 # Initialize services
-db = Database(os.getenv('DATABASE_PATH', 'schedule_notifier.db'))
+db = Database(DB_PATH)
 notifier = NotificationService(os.getenv('FIREBASE_CREDENTIALS_PATH'))
 scraper = BeginHSScraper()
 monitor = ScheduleMonitor(db, notifier)
